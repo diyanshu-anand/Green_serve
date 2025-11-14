@@ -5,10 +5,18 @@ import time
 import numpy as np
 import base64
 
-def get_audio_base64(file_path):
+import os
+import base64
+
+def get_audio_base64(filename):
+    # Absolute path to the file based on this Python file
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, filename)
+
     with open(file_path, "rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
+        return base64.b64encode(f.read()).decode()
+
+alarm_base64 = get_audio_base64("Alarm.mp3")
 
 alarm_base64 = get_audio_base64("Alarm.mp3")
 
