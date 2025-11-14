@@ -103,7 +103,7 @@ with col2:
 camera_placeholder = st.empty()
 
 if st.session_state.show_camera:
-    live_url = "http://127.0.0.1:5000/live"
+    live_url = "https://green-serve-1-i6mj.onrender.com/live"
     camera_placeholder.markdown(
         f"""
         <iframe src="{live_url}" width="640" height="480"
