@@ -10,7 +10,7 @@ def get_audio_base64(file_path):
         data = f.read()
     return base64.b64encode(data).decode()
 
-alarm_base64 = get_audio_base64("Alarm.wav")
+alarm_base64 = get_audio_base64("Alarm.mp3")
 
 alarm_audio = f"""
 <audio controls autoplay loop>
@@ -40,7 +40,7 @@ st.markdown(video_html, unsafe_allow_html=True)
 # --- Title ---
 st.title("🌳 Jungle Sensor Monitoring Dashboard")
 
-API_URL = "http://127.0.0.1:5000/data"
+API_URL = "https://green-serve-1.onrender.com/data"
 
 # --- Auto-refresh data ---
 st.sidebar.header("🔄 Refresh Settings")
@@ -64,6 +64,56 @@ THRESHOLDS = {
     "uv_index": 7,
     "gunfire": 1
 }
+
+# Camera feature 
+
+# st.header("📸 Live Camera Feed")
+
+# if st.button("Show Live Feed"):
+#     live_url = "http://127.0.0.1:5000/live"
+
+#     st.markdown(
+#         f"""
+#         <iframe src="{live_url}" width="640" height="480"
+#         style="border: 3px solid #4CAF50; border-radius: 10px;">
+#         </iframe>
+#         """,
+#         unsafe_allow_html=True
+#     )
+
+
+st.header("📸 Live Camera Feed")
+
+# Initialize session state for camera toggle
+if "show_camera" not in st.session_state:
+    st.session_state.show_camera = False
+
+# Two buttons side-by-side
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("Show Live Feed"):
+        st.session_state.show_camera = True
+
+with col2:
+    if st.button("Hide Live Feed"):
+        st.session_state.show_camera = False
+
+# Display/hide the camera feed container
+camera_placeholder = st.empty()
+
+if st.session_state.show_camera:
+    live_url = "http://127.0.0.1:5000/live"
+    camera_placeholder.markdown(
+        f"""
+        <iframe src="{live_url}" width="640" height="480"
+        style="border: 3px solid #4CAF50; border-radius: 10px; margin-top: 10px;">
+        </iframe>
+        """,
+        unsafe_allow_html=True
+    )
+else:
+    camera_placeholder.empty()
 
 while True:
     try:
