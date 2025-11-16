@@ -14,7 +14,7 @@ import os
 # ---------------------------
 EMAIL_SENDER = "mona100975@gmail.com"
 EMAIL_PASSWORD = "wdpg dgmp zonk hcdq"  # Using App Password for Gmail
-EMAIL_RECEIVER = "Asth23asahu@gmail.com"
+EMAIL_RECEIVER = "Astha23sahu@gmail.com"
 
 API_URL = "https://green-serve-1.onrender.com/data"
 

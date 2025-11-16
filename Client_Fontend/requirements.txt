@@ -1,0 +1,7 @@
+streamlit
+pandas
+requests
+numpy
+pillow
+python-dotenv
+email-validator
