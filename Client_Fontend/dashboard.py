@@ -12,9 +12,9 @@ import os
 # ---------------------------
 # CONFIG: update these values
 # ---------------------------
-EMAIL_SENDER = "email@gmail.com"
-EMAIL_PASSWORD = "email_app_password"  # Use App Password for Gmail
-EMAIL_RECEIVER = "receiver_email@gmail.com"
+EMAIL_SENDER = "mona100975@gmail.com"
+EMAIL_PASSWORD = "wdpg dgmp zonk hcdq"  # Using App Password for Gmail
+EMAIL_RECEIVER = "Asth23asahu@gmail.com"
 
 API_URL = "https://green-serve-1.onrender.com/data"
 
