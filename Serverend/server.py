@@ -17,7 +17,6 @@ def init_db():
                 pressure REAL,
                 altitude REAL,
                 soil_moisture REAL,
-                uv_index REAL,
                 pir_motion REAL,
                 ir_detect REAL,
                 gunfire INTEGER,
@@ -57,14 +56,13 @@ def upload_data():
                 temperature, humidity, pressure, altitude,
                 soil_moisture, uv_index, pir_motion, ir_detect,
                 gunfire,CO_Quality,AIR_Quality,RAIN_Sensing, gps_lat, gps_lon, timestamp
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             data.get("temperature"),
             data.get("humidity"),
             data.get("pressure"),
             data.get("altitude"),
             data.get("soil_moisture"),
-            data.get("uv_index"),
             data.get("pir_motion"),
             data.get("ir_detect"),
             data.get("gunfire"),
