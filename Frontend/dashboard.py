@@ -506,7 +506,8 @@ while True:
         if not df.empty:
             # Convert rain sensor for display
             if "RAIN_Sensing" in df.columns:
-                df["Weather State"] = df["RAIN_Sensing"].apply(lambda x: "🌧️ Raining" if int(x) == 1 else "🌤️ Clear")
+                df["Weather State"] = df["RAIN_Sensing"].apply(lambda x: "🌤️ Clear" if int(x) == 1 else "🌧️ Raining")
+
 
             # Replace any common AQI column names for convenience if present
             possible_aqi_cols = ["Air_Purity", "air_quality", "AQI"]
