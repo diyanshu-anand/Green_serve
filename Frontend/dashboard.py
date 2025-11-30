@@ -1160,7 +1160,7 @@ THRESHOLDS = {
 # ---------------------------
 SOIL_COL = "soil_moisture"
 CO_COL = "CO_Quality"
-BINARY_COLS = ["pir_motion", "ir_detect", "gunfire", "RAIN_Sensing"]
+BINARY_COLS = ["pir_motion", "gunfire", "RAIN_Sensing"]
 
 # ---------------------------
 # Display name mapping
