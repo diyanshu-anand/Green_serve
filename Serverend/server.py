@@ -1,8 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 import sqlite3
 from datetime import datetime
+import base64
+from io import BytesIO
+from PIL import Image
 
 app = Flask(__name__)
+
+# ------------------- GLOBAL -------------------
+latest_frame = None  # store latest camera frame in memory
 
 # ---------------------------------------------------
 # Initialize database (run once)
@@ -43,19 +49,27 @@ def home():
     return jsonify({"status":"API running successfully", "message":"Welcome to the Forest Monitoring World !!"}) 
 
 # ---------------------------------------------------
-# Upload route
+# Upload route for sensors and/or camera
 # ---------------------------------------------------
 @app.route('/upload', methods=['POST'])
 def upload_data():
+    global latest_frame
     try:
         data = request.get_json()
         if not data:
             return jsonify({"error":"No JSON data received"}), 400
 
+        # Check if this is camera data
+        if "camera_image" in data:
+            # Decode base64 image
+            img_data = base64.b64decode(data["camera_image"])
+            latest_frame = BytesIO(img_data)  # store in memory
+            print(f"[+] Camera frame received at {datetime.now()}")
+            return jsonify({"status":"success", "message":"Camera frame stored"})
+
+        # Otherwise assume sensor data
         conn = sqlite3.connect("database.db")
         cur = conn.cursor()
-
-        # Insert all sensor values including uv_index
         cur.execute("""
             INSERT INTO sensor_data (
                 temperature, humidity, pressure, altitude,
@@ -80,19 +94,18 @@ def upload_data():
             data.get("gps_lon"),
             datetime.now().isoformat()
         ))
-
         conn.commit()
         conn.close()
 
-        print(f"[+] Data received and stored at {datetime.now()}")
-        return jsonify({"status":"success", "message":"Data stored successfully"})
+        print(f"[+] Sensor data received at {datetime.now()}")
+        return jsonify({"status":"success", "message":"Sensor data stored successfully"})
 
     except Exception as e:
         print("Error:", e)
         return jsonify({"error": str(e)}), 500
 
 # ---------------------------------------------------
-# Retrieve last 50 readings
+# Retrieve last 50 sensor readings
 # ---------------------------------------------------
 @app.route("/data", methods=["GET"])
 def get_data():
@@ -109,6 +122,17 @@ def get_data():
 
     except Exception as e:
         return jsonify({"status":"error", "message": str(e)}), 500
+
+# ---------------------------------------------------
+# Live camera view route
+# ---------------------------------------------------
+@app.route("/live")
+def live_camera():
+    global latest_frame
+    if latest_frame is None:
+        return "No camera frame yet", 404
+    latest_frame.seek(0)
+    return send_file(latest_frame, mimetype='image/jpeg')
 
 # ---------------------------------------------------
 # Run server
