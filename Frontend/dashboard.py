@@ -1350,6 +1350,12 @@ while True:
                 if "gunfire" in latest and int(latest["gunfire"]) == THRESHOLDS["gunfire"]:
                     alert_messages.append("💥 Shock/Impulse detected!")
             except: pass
+            
+            # IR FLAME ALERT (0 = danger)
+            try:
+                if "ir_detect" in latest and int(latest["ir_detect"]) == 0:
+                    alert_messages.append("🔥 Flame detected! IR sensor triggered")
+            except: pass
 
             # AQI alert
             for aqi_col in ["Air_Purity", "air_quality", "AQI"]:
@@ -1393,6 +1399,17 @@ while True:
                             style = "background-color: #6d4c41; color: white;"
                         elif orig_col in BINARY_COLS and int(float(val)) == 1:
                             style = "background-color: #c62828; color: white;"
+                        elif orig_col == "ir_detect":
+                            if int(float(val)) == 0:   # 0 = flame
+                                style = "background-color: #c62828; color: white;"
+                            else:
+                                style = ""  # 1 = safe
+                        
+                        elif orig_col in BINARY_COLS:
+                            # keep other binary sensors normal (1 means detection)
+                            if int(float(val)) == 1:
+                                style = "background-color: #c62828; color: white;"
+
                     except: style = ""
                     out.append(style)
                 return out
@@ -1449,7 +1466,7 @@ while True:
                     r4c1, r4c2, r4c3, r4c4 = st.columns(4)
                     r4c1.metric("🧪 Gas Leak %", f"{random_sensors['gas_leak_level']} %")
                     r4c2.metric("📳 Vibration Level(vibration sensor)", f"{random_sensors['vibration_level']} g")
-                    r4c3.metric("🗻 Altitude (BPM)", latest.get("air_pressure_altitude","-"))
+                    r4c3.metric("🗻 Altitude (BPM)", latest.get("altitude","-"))
                     r4c4.metric("🔋 Battery Level", f"{random_sensors['battery_level']} %")
 
                 st.markdown("---")
