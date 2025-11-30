@@ -4,65 +4,72 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Initialize database (running once)
-
+# ---------------------------------------------------
+# Initialize database (run once)
+# ---------------------------------------------------
 def init_db():
     conn = sqlite3.connect("database.db")
     cur = conn.cursor()
     cur.execute("""
-            CREATE TABLE IF NOT EXISTS sensor_data(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                temperature REAL,
-                humidity REAL,
-                pressure REAL,
-                altitude REAL,
-                soil_moisture REAL,
-                pir_motion REAL,
-                ir_detect REAL,
-                gunfire INTEGER,
-                CO_Quality REAL,
-                AIR_Quality REAL,
-                RAIN_Sensing REAL,
-                gps_lat REAL,
-                gps_lon REAL,
-                timestamp TEXT
+        CREATE TABLE IF NOT EXISTS sensor_data(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            temperature REAL,
+            humidity REAL,
+            pressure REAL,
+            altitude REAL,
+            soil_moisture REAL,
+            uv_index REAL,
+            pir_motion REAL,
+            ir_detect REAL,
+            gunfire INTEGER,
+            CO_Quality REAL,
+            AIR_Quality REAL,
+            RAIN_Sensing REAL,
+            gps_lat REAL,
+            gps_lon REAL,
+            timestamp TEXT
         )
     """)
-
     conn.commit()
     conn.close()
 
 init_db()
 
-# Route : HOME
-# 
+# ---------------------------------------------------
+# Home route
+# ---------------------------------------------------
 @app.route('/')
 def home():
     return jsonify({"status":"API running successfully", "message":"Welcome to the Forest Monitoring World !!"}) 
 
-
+# ---------------------------------------------------
+# Upload route
+# ---------------------------------------------------
 @app.route('/upload', methods=['POST'])
 def upload_data():
     try:
         data = request.get_json()
-
         if not data:
-            return jsonify({"error":"No JSON data recieved"}), 400
+            return jsonify({"error":"No JSON data received"}), 400
+
         conn = sqlite3.connect("database.db")
         cur = conn.cursor()
 
+        # Insert all sensor values including uv_index
         cur.execute("""
             INSERT INTO sensor_data (
                 temperature, humidity, pressure, altitude,
                 soil_moisture, uv_index, pir_motion, ir_detect,
-                gunfire,CO_Quality,AIR_Quality,RAIN_Sensing, gps_lat, gps_lon, timestamp
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                gunfire, CO_Quality, AIR_Quality, RAIN_Sensing,
+                gps_lat, gps_lon, timestamp
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             data.get("temperature"),
             data.get("humidity"),
             data.get("pressure"),
             data.get("altitude"),
             data.get("soil_moisture"),
+            data.get("uv_index"),
             data.get("pir_motion"),
             data.get("ir_detect"),
             data.get("gunfire"),
@@ -77,34 +84,34 @@ def upload_data():
         conn.commit()
         conn.close()
 
-        print(f"[+] Data recieved and stored at {datetime.now()}")
+        print(f"[+] Data received and stored at {datetime.now()}")
         return jsonify({"status":"success", "message":"Data stored successfully"})
 
-    except Exception as e :
-        print("Error :", e)
+    except Exception as e:
+        print("Error:", e)
         return jsonify({"error": str(e)}), 500
-    
 
-# data endpoint 
-@app.route("/data", methods = ["GET"])
+# ---------------------------------------------------
+# Retrieve last 50 readings
+# ---------------------------------------------------
+@app.route("/data", methods=["GET"])
 def get_data():
     try:
         conn = sqlite3.connect("database.db")
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
-        cur.execute("SELECT * FROM sensor_Data ORDER BY id DESC LIMIT 50") # Latest 50
+        cur.execute("SELECT * FROM sensor_data ORDER BY id DESC LIMIT 50") # Latest 50
         rows = cur.fetchall()
         conn.close()
 
-        # convert to list of dicts 
         data = [dict(row) for row in rows]
-        return jsonify({"status":"success", "data":data}), 200
-    
+        return jsonify({"status":"success", "data": data}), 200
+
     except Exception as e:
         return jsonify({"status":"error", "message": str(e)}), 500
 
-        
-# Run Server
-
+# ---------------------------------------------------
+# Run server
+# ---------------------------------------------------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
