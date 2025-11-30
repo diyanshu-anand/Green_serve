@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime
 import base64
 from io import BytesIO
-# from PIL import Image
+from PIL import Image
 
 app = Flask(__name__)
 
